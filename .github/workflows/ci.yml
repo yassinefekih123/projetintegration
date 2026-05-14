@@ -27,6 +27,15 @@ jobs:
       - name: Run Maven tests
         working-directory: ./backend
         run: mvn -B -DskipTests=false test
+      - name: Publish JUnit results to PR
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: backend-maven-tests
+          path: backend/target/surefire-reports/*.xml
+          reporter: junit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload JUnit results
         if: always()
         uses: actions/upload-artifact@v4
