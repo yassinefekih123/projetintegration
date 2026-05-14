@@ -1,4 +1,33 @@
 # Java
+/backend/target/
+*.class
+
+# Node
+/frontend/node_modules/
+/frontend/.next/
+/frontend/.parcel-cache/
+/frontend/dist/
+
+# IDE
+.idea/
+/.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Cypress videos & screenshots
+frontend/cypress/videos/
+frontend/cypress/screenshots/
+
+# Maven
+/.mvn/
+# Java
 /target/
 *.class
 *.log

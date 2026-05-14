@@ -4,7 +4,7 @@
     "moduleResolution": "bundler",
     "target": "esnext",
     "types": [],
-    "sourceMap": true,
+    "sourceMap": false,
     "declaration": true,
     "declarationMap": true,
     "noUncheckedIndexedAccess": false,

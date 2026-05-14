@@ -25,3 +25,12 @@ body {
   color: inherit;
 }
 
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-6px); }
+}
+
+.animate-fade-out {
+  animation: fadeOut 180ms ease-in forwards;
+}
+

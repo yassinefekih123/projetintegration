@@ -2,7 +2,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import Toast from "./Toast";
 
-type ToastItem = { id: number; message: string };
+type ToastItem = { id: number; message: string; closing?: boolean };
 
 type ToastContextType = {
   show: (message: string) => void;
@@ -20,13 +20,20 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const idRef = React.useRef(1);
 
+  const ANIM_MS = 200;
+
+  const startClose = useCallback((id: number) => {
+    setToasts((t) => t.map((x) => (x.id === id ? { ...x, closing: true } : x)));
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), ANIM_MS);
+  }, []);
+
   const show = useCallback((message: string) => {
     const id = idRef.current++;
     setToasts((t) => [...t, { id, message }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3000);
-  }, []);
+    setTimeout(() => startClose(id), 3000);
+  }, [startClose]);
 
-  const remove = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), []);
+  const remove = useCallback((id: number) => startClose(id), [startClose]);
   const value = useMemo(() => ({ show }), [show]);
 
   return (
@@ -34,7 +41,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {children}
       <div className="fixed top-4 right-4 space-y-2 z-50">
         {toasts.map((t) => (
-          <Toast key={t.id} message={t.message} onClose={() => remove(t.id)} />
+          <Toast key={t.id} message={t.message} onClose={() => remove(t.id)} closing={t.closing} />
         ))}
       </div>
     </ToastContext.Provider>
