@@ -1,5 +1,61 @@
 # Mobile Accessories Manager
 
+Lightweight full-stack app for managing mobile phone accessories.
+
+Quick start
+
+Prerequisites:
+- Java 17
+- Maven
+- Node 18+ / npm
+- (optional) Docker & Docker Compose
+
+Run backend tests:
+
+```bash
+cd backend
+mvn -DskipTests=false test
+```
+
+Run frontend (dev):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Run Cypress E2E (headless):
+
+Start frontend (dev or `npm run start`) then:
+
+```bash
+cd frontend
+npm run cypress:run -- --headless
+```
+
+Build production frontend:
+
+```bash
+cd frontend
+npm run build
+```
+
+CI
+
+GitHub Actions workflow runs backend Maven tests and Cypress E2E. JUnit
+reports and Cypress videos are uploaded as artifacts.
+
+Notes
+- Seed SQL is in `deploy/sql/seed.sql` and requires `pgcrypto` for UUIDs.
+- To push changes, add a remote and push your branch:
+
+```bash
+git remote add origin <URL>
+git push -u origin feat/frontend-toasts
+```
+# Mobile Accessories Manager
+
 Professional full-stack application for managing mobile phone accessories — enterprise-grade, secure, and production-ready scaffolding suitable for university capstones or internship demos.
 
 --
