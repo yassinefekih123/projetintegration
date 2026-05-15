@@ -25,8 +25,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run Maven tests
-        working-directory: ./backend
-        run: mvn -B -DskipTests=false test
+        # Print diagnostics and run Maven with verbose output; upload mvn log
+        - name: Print Java and Maven versions
+          run: |
+            java -version || true
+            mvn -version || true
+            env | sort
+        - name: Run Maven tests (verbose)
+          working-directory: ./backend
+          run: |
+            bash -lc "mvn -B -DskipTests=false -e -X test | tee mvn-test.log; exit ${PIPESTATUS[0]}"
+        - name: Upload Maven log
+          if: always()
+          uses: actions/upload-artifact@v4
+          with:
+            name: backend-mvn-log
+            path: backend/mvn-test.log
       - name: Publish JUnit results to PR
         if: always()
         uses: dorny/test-reporter@v1
