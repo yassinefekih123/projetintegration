@@ -22,12 +22,13 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     ports:
-      - '8080:8080'
+      - '8081:8080'
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/accessories
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_REDIS_HOST: redis
+      JWT_SECRET: b3d7f9c1a5e2f0d3b4c6a1e9f8d7c3b2a1e4f6c8d9b0a2c3d4e5f6a7b8c9d0
     depends_on:
       - db
       - redis
@@ -37,7 +38,7 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
     ports:
-      - '3000:3000'
+      - '3001:3000'
     environment:
       NEXT_TELEMETRY_DISABLED: '1'
     depends_on:
