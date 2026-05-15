@@ -66,17 +66,14 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
-      - name: Start frontend (background)
-        working-directory: ./frontend
-        run: |
-          npm run start &
-          npx wait-on http://localhost:3000
+      # Removed background start to avoid double-starting the server
+      # Cypress action will start the app itself using the `start` option below.
       - name: Run Cypress tests (official action)
         uses: cypress-io/github-action@v5
         with:
           start: npm start
           wait-on: http://localhost:3000
-          wait-on-timeout: 60
+          wait-on-timeout: 120
         working-directory: ./frontend
       - name: Upload Cypress video
         if: always()
