@@ -1,0 +1,12 @@
+{
+  "name": "project-root-scripts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "frontend:install": "cd frontend && npm ci",
+    "frontend:build": "cd frontend && npm run build",
+    "frontend:start": "cd frontend && npm run start",
+    "e2e": "cd frontend && npx cypress run --config baseUrl=http://localhost:3000",
+    "e2e:open": "cd frontend && npx cypress open"
+  }
+}
