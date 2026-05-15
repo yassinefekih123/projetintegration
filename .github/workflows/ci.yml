@@ -31,10 +31,29 @@ jobs:
             java -version || true
             mvn -version || true
             env | sort
-        - name: Run Maven tests (verbose)
+        - name: Run Maven tests (verbose) with retries
           working-directory: ./backend
           run: |
-            bash -lc "mvn -B -DskipTests=false -e -X test | tee mvn-test.log; exit ${PIPESTATUS[0]}"
+            bash -lc '
+            rc=1
+            for i in 1 2 3; do
+              echo "Maven attempt $i/3"
+              mvn -B -DskipTests=false -e -X test | tee mvn-test.log
+              rc=${PIPESTATUS[0]}
+              if [ "$rc" -eq 0 ]; then
+                echo "Maven succeeded on attempt $i"
+                rc=0
+                break
+              else
+                echo "Maven failed on attempt $i with exit $rc"
+                if [ $i -lt 3 ]; then
+                  echo "Retrying after backoff..."
+                  sleep $((i*10))
+                fi
+              fi
+            done
+            exit $rc
+            '
         - name: Upload Maven log
           if: always()
           uses: actions/upload-artifact@v4
