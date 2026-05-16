@@ -24,42 +24,40 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Run Maven tests
-        # Print diagnostics and run Maven with verbose output; upload mvn log
-        - name: Print Java and Maven versions
-          run: |
-            java -version || true
-            mvn -version || true
-            env | sort
-        - name: Run Maven tests (verbose) with retries
-          working-directory: ./backend
-          run: |
-            bash -lc '
-            rc=1
-            for i in 1 2 3; do
-              echo "Maven attempt $i/3"
-              mvn -B -DskipTests=false -e -X test | tee mvn-test.log
-              rc=${PIPESTATUS[0]}
-              if [ "$rc" -eq 0 ]; then
-                echo "Maven succeeded on attempt $i"
-                rc=0
-                break
-              else
-                echo "Maven failed on attempt $i with exit $rc"
-                if [ $i -lt 3 ]; then
-                  echo "Retrying after backoff..."
-                  sleep $((i*10))
-                fi
+      - name: Print Java and Maven versions
+        run: |
+          java -version || true
+          mvn -version || true
+          env | sort
+      - name: Run Maven tests (verbose) with retries
+        working-directory: ./backend
+        run: |
+          bash -lc '
+          rc=1
+          for i in 1 2 3; do
+            echo "Maven attempt $i/3"
+            mvn -B -DskipTests=false -e -X test | tee mvn-test.log
+            rc=${PIPESTATUS[0]}
+            if [ "$rc" -eq 0 ]; then
+              echo "Maven succeeded on attempt $i"
+              rc=0
+              break
+            else
+              echo "Maven failed on attempt $i with exit $rc"
+              if [ $i -lt 3 ]; then
+                echo "Retrying after backoff..."
+                sleep $((i*10))
               fi
-            done
-            exit $rc
-            '
-        - name: Upload Maven log
-          if: always()
-          uses: actions/upload-artifact@v4
-          with:
-            name: backend-mvn-log
-            path: backend/mvn-test.log
+            fi
+          done
+          exit $rc
+          '
+      - name: Upload Maven log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-mvn-log
+          path: backend/mvn-test.log
       - name: Publish JUnit results to PR
         if: always()
         uses: dorny/test-reporter@v1
