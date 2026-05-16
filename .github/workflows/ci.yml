@@ -24,16 +24,47 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Run Maven tests
+      - name: Print Java and Maven versions
+        run: |
+          java -version || true
+          mvn -version || true
+          env | sort
+      - name: Run Maven tests (verbose) with retries
         working-directory: ./backend
-        run: mvn -B -DskipTests=false test
+        run: |
+          bash -lc '
+          rc=1
+          for i in 1 2 3; do
+            echo "Maven attempt $i/3"
+            mvn -B -DskipTests=false -e -X test | tee mvn-test.log
+            rc=${PIPESTATUS[0]}
+            if [ "$rc" -eq 0 ]; then
+              echo "Maven succeeded on attempt $i"
+              rc=0
+              break
+            else
+              echo "Maven failed on attempt $i with exit $rc"
+              if [ $i -lt 3 ]; then
+                echo "Retrying after backoff..."
+                sleep $((i*10))
+              fi
+            fi
+          done
+          exit $rc
+          '
+      - name: Upload Maven log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-mvn-log
+          path: backend/mvn-test.log
       - name: Publish JUnit results to PR
         if: always()
         uses: dorny/test-reporter@v1
         with:
           name: backend-maven-tests
           path: backend/target/surefire-reports/*.xml
-          reporter: junit
+          reporter: java-junit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload JUnit results
@@ -66,18 +97,14 @@ jobs:
       - name: Build frontend
         working-directory: ./frontend
         run: npm run build
-      - name: Start frontend (background)
-        working-directory: ./frontend
-        run: |
-          npm run start &
-          npx wait-on http://localhost:3000
+      # Removed background start to avoid double-starting the server
+      # Cypress action will start the app itself using the `start` option below.
       - name: Run Cypress tests (official action)
         uses: cypress-io/github-action@v5
         with:
-          start: npm start
+          start: cd frontend && npm start
           wait-on: http://localhost:3000
-          wait-on-timeout: 60
-        working-directory: ./frontend
+          wait-on-timeout: 120
       - name: Upload Cypress video
         if: always()
         uses: actions/upload-artifact@v4

@@ -1,18 +1,12 @@
-FROM maven:3.8.8-eclipse-temurin-17 AS build
+# Multi-stage Dockerfile for backend (Spring Boot)
+FROM maven:3.9.4-eclipse-temurin-17 AS builder
 WORKDIR /workspace
+COPY backend/pom.xml ./
+COPY backend/src ./src
+RUN mvn -B -DskipTests package spring-boot:repackage
 
-# Copy only what we need to build
-COPY backend/pom.xml backend/
-COPY backend/src backend/src
-
-RUN mvn -f backend/pom.xml -B -DskipTests package
-
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:17-jre-jammy AS runtime
 WORKDIR /app
-COPY --from=build /workspace/backend/target/*.jar app.jar
+COPY --from=builder /workspace/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app/app.jar"]
-FROM eclipse-temurin:21-jdk-jammy
-WORKDIR /app
-COPY target/*.jar app.jar
 ENTRYPOINT ["java","-jar","/app/app.jar"]

@@ -4,15 +4,13 @@
 
 This draft captures the intended pull request for the `feat/frontend-toasts` branch.
 
-- Adds a global toast provider and `Toast` UI component.
-- Adds a `ConfirmModal` component and wiring for order cancellation flows.
-- Adds Cypress E2E tests for order cancellation and order list -> detail view.
-- Fixes backend `CacheConfig` to avoid overriding Spring Boot auto-configured `CacheManager`.
-- Removes frontend build artifacts from repository and adds root-level npm scripts.
+
+<!-- ci-trigger -->
+Triggered CI on: 2026-05-15T00:00:00Z
+Triggered CI rerun at: 2026-05-15T18:20:00Z
+Triggered CI rerun at: 2026-05-15T18:22:00Z
 
 ## Branch
-
-- Head: `feat/frontend-toasts` (pushed)
 - Base: `main` (created from feature branch for PR flow)
 
 ## Key commits (recent)
